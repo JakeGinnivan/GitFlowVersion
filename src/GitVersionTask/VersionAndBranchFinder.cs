@@ -14,9 +14,15 @@ public static class VersionAndBranchFinder
             versionVariables = GetVersion(directory, authentication, noFetch, fileSystem);
             return true;
         }
-        catch (Exception ex)
+        catch (WarningException ex)
         {
             Logger.WriteWarning("Could not determine assembly version: " + ex.Message);
+            versionVariables = null;
+            return false;
+        }
+        catch (Exception ex)
+        {
+            Logger.WriteWarning("Unexpected exception:\r\n" + ex);
             versionVariables = null;
             return false;
         }
@@ -25,6 +31,10 @@ public static class VersionAndBranchFinder
     public static VersionVariables GetVersion(string directory, Authentication authentication, bool noFetch, IFileSystem fileSystem)
     {
         var gitDir = GitDirFinder.TreeWalkForDotGitDir(directory);
+        if (string.IsNullOrEmpty(gitDir))
+        {
+            throw new WarningException(string.Format("Failed to find the .git directory in path '{0}', check the documentation for your build server or the FAQ for more info", directory));
+        }
         using (var repo = RepositoryLoader.GetRepo(gitDir))
         {
             var ticks = DirectoryDateFinder.GetLastDirectoryWrite(directory);

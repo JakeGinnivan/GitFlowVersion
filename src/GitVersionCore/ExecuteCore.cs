@@ -1,6 +1,5 @@
 namespace GitVersion
 {
-    using System;
     using System.Linq;
     using GitVersion.Helpers;
 
@@ -16,8 +15,7 @@ namespace GitVersion
             Logger.WriteInfo(string.Format("Project root is: " + projectRoot));
             if (string.IsNullOrEmpty(dotGitDirectory) || string.IsNullOrEmpty(projectRoot))
             {
-                // TODO Link to wiki article
-                throw new Exception(string.Format("Failed to prepare or find the .git directory in path '{0}'.", workingDirectory));
+                throw new WarningException(string.Format("Failed to prepare or find the .git directory in path '{0}', check the documentation for your build server or the FAQ for more info", workingDirectory));
             }
             VersionVariables variables;
             var versionFinder = new GitVersionFinder();
